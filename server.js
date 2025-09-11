@@ -13,8 +13,13 @@ const app = express();
 connectDB();
 
 app.use(cors({
-    origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
-    credentials: true
+  origin: [
+    'http://localhost:3000',
+    'https://earning-website-ashen.vercel.app',
+    'https://www.veranix-ai.com',
+    'https://api.veranix-ai.com',
+  ],
+  credentials: true,
 }));
 
 app.use(express.json({ limit: '16kb' }));
