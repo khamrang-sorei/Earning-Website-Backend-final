@@ -15,6 +15,8 @@ import incomeVerificationRoutes from './incomeVerificationRoutes.js';
 
 const router = Router();
 
+router.use('/blogs', blogs);
+
 router.use(verifyJWT);
 
 router.use('/dashboard', dashboardRoutes);
@@ -27,7 +29,6 @@ router.use('/reports', reportsRoutes);
 router.use('/security', securityRoutes);
 router.use('/topics', topicRoutes);
 router.use('/support', supportRoutes);
-router.use('/blogs', blogs);
 router.use('/income-verification', incomeVerificationRoutes);
 
 export default router;
