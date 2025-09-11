@@ -14,7 +14,7 @@ const canManageSecurity = checkRole(['SUPER_ADMIN']);
 
 router
   .route("/blog")
-  .get(canManageSecurity, getAllBlogPostsForAdmin)
+  .get( getAllBlogPostsForAdmin)
   .post(canManageSecurity, upload.single("image"), createBlogPost);
 
 router
@@ -23,3 +23,4 @@ router
   .delete(canManageSecurity, deleteBlogPost);
 
 export default router;
+
