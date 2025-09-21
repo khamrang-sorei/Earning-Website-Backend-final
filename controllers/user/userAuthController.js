@@ -69,7 +69,20 @@ const sendOtp = asyncHandler(async (req, res) => {
     const mobileOtp = Math.floor(100000 + Math.random() * 900000).toString();
     const otpExpiry = new Date(Date.now() + 10 * 60 * 1000);
     await User.findOneAndUpdate({ $or: [{ email }, { mobile }] }, { email, mobile, emailOtp, emailOtpExpiry: otpExpiry, mobileOtp, mobileOtpExpiry: otpExpiry, isEmailVerified: false, isMobileVerified: false }, { upsert: true, new: true, setDefaultsOnInsert: true });
-    try { await sendEmail({ to: email, subject: "Your UEIEP Verification Code", html: `<h1>Your OTP is: ${emailOtp}</h1><p>It is valid for 10 minutes.</p>` }); console.log(`Mobile OTP for ${mobile} is ${mobileOtp}`); } catch (error) { throw new ApiError(500, "Failed to send OTP. Please try again."); }
+    try { 
+        await sendEmail({ 
+            to: email, 
+            subject: "Your UEIEP Verification Codes", 
+            html: `
+                <h1>Your Verification Codes</h1>
+                <p><strong>Email OTP:</strong> ${emailOtp}</p>
+                <p><strong>Mobile OTP:</strong> ${mobileOtp}</p>
+                <p>Both codes are valid for 10 minutes.</p>
+            ` 
+        }); 
+    } catch (error) { 
+        throw new ApiError(500, "Failed to send OTP. Please try again."); 
+    }
     return res.status(200).json(new ApiResponse(200, {}, "OTP sent successfully."));
 });
 
