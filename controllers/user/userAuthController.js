@@ -3,6 +3,7 @@ import { ApiError } from "../../utils/ApiError.js";
 import { User } from "../../models/user.model.js";
 import { ApiResponse } from "../../utils/ApiResponse.js";
 import { sendEmail } from "../../services/emailService.js";
+import { sendOtp as sendMsg91Otp } from "../../services/msg91Service.js";
 import crypto from "crypto";
 
 const getCurrentUser = asyncHandler(async (req, res) => {
@@ -70,17 +71,23 @@ const sendOtp = asyncHandler(async (req, res) => {
     const otpExpiry = new Date(Date.now() + 10 * 60 * 1000);
     await User.findOneAndUpdate({ $or: [{ email }, { mobile }] }, { email, mobile, emailOtp, emailOtpExpiry: otpExpiry, mobileOtp, mobileOtpExpiry: otpExpiry, isEmailVerified: false, isMobileVerified: false }, { upsert: true, new: true, setDefaultsOnInsert: true });
     try { 
+        // Send mobile OTP via SMS
+        console.log('📱 Attempting to send SMS OTP to:', mobile);
+        await sendMsg91Otp(mobile, mobileOtp);
+        console.log('✅ SMS OTP sent successfully');
+        
+        // Send email with both OTPs
         await sendEmail({ 
             to: email, 
             subject: "Your UEIEP Verification Codes", 
             html: `
-                <h1>Your Verification Codes</h1>
+                <h1>Your UEIEP Email Verification Code</h1>
                 <p><strong>Email OTP:</strong> ${emailOtp}</p>
-                <p><strong>Mobile OTP:</strong> ${mobileOtp}</p>
-                <p>Both codes are valid for 10 minutes.</p>
-            ` 
+                <p>This code is valid for 10 minutes.</p>
+            `
         }); 
     } catch (error) { 
+        console.error('❌ Error sending OTP:', error);
         throw new ApiError(500, "Failed to send OTP. Please try again."); 
     }
     return res.status(200).json(new ApiResponse(200, {}, "OTP sent successfully."));
